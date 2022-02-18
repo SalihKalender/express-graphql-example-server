@@ -67,6 +67,38 @@ const Mutation = new GraphQLObjectType({
             return {...args, id: Post_data[Post_data.length - 1].id, userId: Post_data[Post_data.length - 1].userId};
         },
       },
+      updatePost: {
+        type: Post_Type,
+        args: {
+            id: { type: graphql.GraphQLInt },
+            body: { type: graphql.GraphQLString },
+            title: { type: graphql.GraphQLString }
+        },
+        resolve(parent, args) {
+            let returned = {}
+            Post_data.forEach(post => {
+                if(post.id == args.id) {
+                    post.body = args.body;
+                    post.title = args.title;
+                    returned = post
+                }
+            })
+            fse.outputFile(path.join(__dirname, '/fake_data/posts.json'), JSON.stringify(Post_data))
+            return returned
+        } 
+      },
+      deletePost: {
+        type: graphql.GraphQLString,
+        args: {
+            id: { type: graphql.GraphQLInt },
+        },
+        resolve(parent, args) {
+            const index = Post_data.findIndex(post => post.id == args.id)
+            Post_data.splice(index, 1)
+            fse.outputFile(path.join(__dirname, '/fake_data/posts.json'), JSON.stringify(Post_data))
+            return 'Delete Succesfully'
+        }
+      }
     },
   });
 
